@@ -13,6 +13,10 @@ const CopilotSchema = z.object({
   seekerId: z.string().min(1, 'seekerId is required'),
   question: z.string().min(1, 'question is required'),
 });
+const InterviewKitSchema = z.object({
+  requisitionId: z.string().min(1, 'requisitionId is required'),
+  candidateId: z.string().min(1, 'candidateId is required'),
+});
 
 @Controller('agent')
 export class AgentController {
@@ -34,5 +38,12 @@ export class AgentController {
     const { seekerId, question } = validate(CopilotSchema, body);
     const { steps, answer } = await this.agents.runCopilot(seekerId, question);
     return ok({ mode: this.agents.modelEnabled() ? 'ai' : 'heuristic', steps, answer });
+  }
+
+  @Post('interview-kit')
+  async interviewKit(@Body() body: unknown) {
+    const { requisitionId, candidateId } = validate(InterviewKitSchema, body);
+    const { steps, kit } = await this.agents.runInterviewKit(requisitionId, candidateId);
+    return ok({ steps, kit });
   }
 }

@@ -211,6 +211,37 @@ export const AuditEntry = z.object({
 });
 export type AuditEntry = z.infer<typeof AuditEntry>;
 
+/* ─────────────────────────── Interview kit (lifecycle stage 4: Interview) ─────────────────────────── */
+
+export const InterviewQuestionType = z.enum(['technical', 'behavioral', 'system-design', 'culture']);
+export type InterviewQuestionType = z.infer<typeof InterviewQuestionType>;
+
+export const InterviewQuestion = z.object({
+  area: z.string(),
+  type: InterviewQuestionType,
+  question: z.string(),
+  whatToListenFor: z.string().default(''),
+});
+export type InterviewQuestion = z.infer<typeof InterviewQuestion>;
+
+export const ScorecardCriterion = z.object({
+  criterion: z.string(),
+  weight: z.number().int().min(1).max(5),
+  rationale: z.string().default(''),
+});
+export type ScorecardCriterion = z.infer<typeof ScorecardCriterion>;
+
+/** A tailored interview plan generated from a (job, candidate) pairing and its match gaps. */
+export const InterviewKit = z.object({
+  candidateName: z.string(),
+  jobTitle: z.string(),
+  focusAreas: z.array(z.string()).default([]),
+  questions: z.array(InterviewQuestion).default([]),
+  scorecard: z.array(ScorecardCriterion).default([]),
+  mode: ResultMode,
+});
+export type InterviewKit = z.infer<typeof InterviewKit>;
+
 /* ─────────────────────────── API envelope ─────────────────────────── */
 
 export type ApiOk<T> = { ok: true; data: T };
