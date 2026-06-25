@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.next/
+out/
+build/
+.swc/
+*.log
+.env
+.env.local
+.env.*.local
+data/*.db
+data/backups/
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.vercel

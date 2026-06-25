@@ -1,0 +1,14 @@
+{
+  // Type-checking only (no emit). SWC performs the actual build (see nest-cli.json).
+  // Uses `bundler` module resolution — far faster on the deep LangChain type graph than
+  // classic `node` resolution — which is purely a checking concern and does not affect
+  // the CommonJS output SWC produces.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────────── Base ───────────────────────────── */
+@layer base {
+  :root {
+    /* Atmospheric helpers reused by .bg-grid / .bg-mesh utilities below. */
+    --jm-grid: rgba(79, 70, 229, 0.06);
+    --jm-ring: 99 102 241; /* brand-500 as space-separated RGB for ring alpha */
+  }
+
+  * {
+    border-color: theme('colors.slate.200');
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* offset for any in-page anchors under a sticky top bar */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: theme('colors.surface.muted');
+    color: theme('colors.ink.DEFAULT');
+    font-family: theme('fontFamily.sans');
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1.55;
+  }
+
+  /* Fluid, characterful headings on the mandated system stack. */
+  h1, h2, h3, h4 {
+    color: theme('colors.ink.DEFAULT');
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Branded text selection. */
+  ::selection {
+    background-color: theme('colors.brand.600');
+    color: white;
+  }
+
+  /* Accessible, visible focus ring on every interactive element. */
+  :where(a, button, input, select, textarea, [tabindex], [role='button'], [role='tab']):focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px theme('colors.surface.DEFAULT'),
+      0 0 0 4px theme('colors.brand.500');
+    border-radius: theme('borderRadius.lg');
+  }
+
+  /* Don't show the fallback outline twice. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Nicer, brand-tinted scrollbar (progressive enhancement). */
+  * {
+    scrollbar-color: theme('colors.brand.300') transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: theme('colors.brand.300');
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: theme('colors.brand.400');
+  }
+}
+
+/* ─────────────────────────── Components ─────────────────────────── */
+@layer components {
+  /* Standard page gutter + max width, reused across portals and marketing. */
+  .container-page {
+    width: 100%;
+    max-width: 80rem; /* 1280px */
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Section vertical rhythm for the landing page. */
+  .section {
+    padding-block: 4.5rem;
+  }
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 6rem;
+    }
+  }
+
+  /* The brand wordmark gradient (indigo → orange). */
+  .text-gradient-brand {
+    background-image: linear-gradient(
+      100deg,
+      theme('colors.brand.600'),
+      theme('colors.brand.500') 45%,
+      theme('colors.accent.500')
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Glassy, elevated surface used for floating cards over the mesh. */
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: theme('boxShadow.lift');
+  }
+
+  /* Pill chip used for eyebrow labels. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid theme('colors.brand.100');
+    background-color: theme('colors.brand.50');
+    color: theme('colors.brand.700');
+    padding: 0.3125rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+}
+
+/* ─────────────────────────── Utilities ─────────────────────────── */
+@layer utilities {
+  /* Subtle dot-grid texture — atmosphere without noise. */
+  .bg-grid {
+    background-image: radial-gradient(var(--jm-grid) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: -11px -11px;
+  }
+
+  /* Soft multi-stop gradient mesh for hero atmosphere. */
+  .bg-mesh {
+    background-color: theme('colors.surface.muted');
+    background-image:
+      radial-gradient(40rem 30rem at 8% -10%, theme('colors.brand.100'), transparent 55%),
+      radial-gradient(34rem 26rem at 100% 0%, theme('colors.accent.100'), transparent 50%),
+      radial-gradient(40rem 34rem at 50% 120%, theme('colors.brand.50'), transparent 60%);
+  }
+
+  /* Staggered reveal helpers (pair with .animate-fade-up). */
+  .delay-75 { animation-delay: 75ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-500 { animation-delay: 500ms; }
+}
+
+/* ─────────────────── Reduced motion (accessibility) ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
