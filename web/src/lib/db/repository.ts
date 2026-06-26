@@ -39,6 +39,12 @@ export interface Repository {
   listOutreach(requisitionId?: string): OutreachMessage[];
   createOutreach(m: OutreachMessage): OutreachMessage;
 
+  /**
+   * The two-way flywheel: recruiter interest in a platform seeker — pipeline cards and
+   * outreach that target this seeker's own candidate profile. Empty if no recruiter has engaged.
+   */
+  interestForSeeker(seekerId: string): { cards: PipelineCard[]; outreach: OutreachMessage[] };
+
   // Audit
   listAudit(limit?: number): AuditEntry[];
   audit(entry: Omit<AuditEntry, 'id' | 'at'>): AuditEntry;

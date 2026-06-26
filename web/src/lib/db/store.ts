@@ -148,6 +148,15 @@ export class InMemoryStore implements Repository {
     return m;
   }
 
+  interestForSeeker(seekerId: string): { cards: PipelineCard[]; outreach: OutreachMessage[] } {
+    const seeker = this.getSeeker(seekerId);
+    if (!seeker) return { cards: [], outreach: [] };
+    const candidateId = seeker.profile.id;
+    const cards = [...this.pipeline.values()].filter((c) => c.candidate.id === candidateId);
+    const outreach = [...this.outreach.values()].filter((m) => m.candidateId === candidateId);
+    return { cards, outreach };
+  }
+
   /* ── Audit ──────────────────────────────────────────────────── */
 
   listAudit(limit?: number): AuditEntry[] {

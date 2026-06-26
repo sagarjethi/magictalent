@@ -16,6 +16,7 @@ import { PipelineController } from './modules/pipeline.controller';
 import { ApplicationsController } from './modules/applications.controller';
 import { OutreachController } from './modules/outreach.controller';
 import { SeekerController } from './modules/seeker.controller';
+import { SeekerInterestController } from './modules/seeker-interest.controller';
 import { AtsController } from './modules/ats.controller';
 import { AgentController } from './modules/agent.controller';
 import { AuditController } from './modules/audit.controller';
@@ -34,6 +35,7 @@ import { AuthController } from './modules/auth.controller';
     ApplicationsController,
     OutreachController,
     SeekerController,
+    SeekerInterestController,
     AtsController,
     AgentController,
     AuditController,
