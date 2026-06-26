@@ -16,6 +16,7 @@ import type {
   ApplicationStatus,
   AuditEntry,
   CandidateProfile,
+  InterviewSession,
   Job,
   OutreachMessage,
   PipelineCard,
@@ -36,6 +37,7 @@ export class InMemoryStore implements Repository {
   private pipeline = new Map<string, PipelineCard>();
   private applications = new Map<string, Application>();
   private outreach = new Map<string, OutreachMessage>();
+  private interviews = new Map<string, InterviewSession>();
   private auditLog: AuditEntry[] = [];
 
   constructor() {
@@ -49,6 +51,7 @@ export class InMemoryStore implements Repository {
     for (const c of data.pipeline) this.pipeline.set(c.id, c);
     for (const a of data.applications) this.applications.set(a.id, a);
     for (const m of data.outreach) this.outreach.set(m.id, m);
+    for (const iv of data.interviews ?? []) this.interviews.set(iv.id, iv);
     this.auditLog = [...data.audit];
   }
 
@@ -155,6 +158,39 @@ export class InMemoryStore implements Repository {
     const cards = [...this.pipeline.values()].filter((c) => c.candidate.id === candidateId);
     const outreach = [...this.outreach.values()].filter((m) => m.candidateId === candidateId);
     return { cards, outreach };
+  }
+
+  /* ── Video interviews ───────────────────────────────────────── */
+
+  listInterviews(requisitionId?: string): InterviewSession[] {
+    const all = [...this.interviews.values()].sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt));
+    return requisitionId ? all.filter((s) => s.requisitionId === requisitionId) : all;
+  }
+
+  getInterview(id: string): InterviewSession | undefined {
+    return this.interviews.get(id);
+  }
+
+  createInterview(s: InterviewSession): InterviewSession {
+    this.interviews.set(s.id, s);
+    return s;
+  }
+
+  updateInterview(id: string, patch: Partial<InterviewSession>): InterviewSession | undefined {
+    const existing = this.interviews.get(id);
+    if (!existing) return undefined;
+    const updated: InterviewSession = { ...existing, ...patch, id: existing.id, updatedAt: now() };
+    this.interviews.set(id, updated);
+    return updated;
+  }
+
+  interviewsForSeeker(seekerId: string): InterviewSession[] {
+    const seeker = this.getSeeker(seekerId);
+    if (!seeker) return [];
+    const candidateId = seeker.profile.id;
+    return [...this.interviews.values()]
+      .filter((s) => s.candidateId === candidateId)
+      .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt));
   }
 
   /* ── Audit ──────────────────────────────────────────────────── */

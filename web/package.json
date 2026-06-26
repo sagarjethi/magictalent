@@ -17,6 +17,7 @@
     "@langchain/anthropic": "^0.3.11",
     "@langchain/core": "^0.3.27",
     "@langchain/langgraph": "^0.2.39",
+    "@langchain/openai": "^0.3.17",
     "better-sqlite3": "^11.3.0",
     "lucide-react": "^0.424.0",
     "next": "^14.2.5",

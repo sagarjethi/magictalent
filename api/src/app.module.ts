@@ -17,6 +17,8 @@ import { ApplicationsController } from './modules/applications.controller';
 import { OutreachController } from './modules/outreach.controller';
 import { SeekerController } from './modules/seeker.controller';
 import { SeekerInterestController } from './modules/seeker-interest.controller';
+import { SeekerInterviewsController } from './modules/seeker-interviews.controller';
+import { InterviewController } from './modules/interview.controller';
 import { AtsController } from './modules/ats.controller';
 import { AgentController } from './modules/agent.controller';
 import { AuditController } from './modules/audit.controller';
@@ -36,6 +38,8 @@ import { AuthController } from './modules/auth.controller';
     OutreachController,
     SeekerController,
     SeekerInterestController,
+    SeekerInterviewsController,
+    InterviewController,
     AtsController,
     AgentController,
     AuditController,

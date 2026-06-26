@@ -306,6 +306,92 @@ export const InterviewPrep = z.object({
 });
 export type InterviewPrep = z.infer<typeof InterviewPrep>;
 
+/* ─────────────────────────── Video interview (lifecycle stage 4: Interview, live) ─────────────────────────── */
+
+/** Lifecycle of a scheduled live video interview. */
+export const InterviewStatus = z.enum(['scheduled', 'in-progress', 'recorded', 'completed', 'cancelled']);
+export type InterviewStatus = z.infer<typeof InterviewStatus>;
+
+/** How the candidate is told about the interview. In-app is always available; email/sms when a provider is configured. */
+export const InviteChannel = z.enum(['email', 'sms', 'in-app']);
+export type InviteChannel = z.infer<typeof InviteChannel>;
+
+/** One delivery attempt of the interview invite. `simulated` = no provider keys, so it was logged not actually sent. */
+export const InterviewInvite = z.object({
+  channel: InviteChannel,
+  to: z.string().default(''),
+  subject: z.string().default(''),
+  body: z.string().default(''),
+  status: z.enum(['queued', 'sent', 'simulated', 'failed']).default('queued'),
+  sentAt: z.string().optional(),
+});
+export type InterviewInvite = z.infer<typeof InterviewInvite>;
+
+/** Rolling tally of chunked video upload — we record the protocol, not the bytes, in the MVP store. */
+export const RecordingMeta = z.object({
+  chunkCount: z.number().int().min(0).default(0),
+  totalBytes: z.number().int().min(0).default(0),
+  mimeType: z.string().default(''),
+  durationSec: z.number().min(0).default(0),
+  complete: z.boolean().default(false),
+  lastChunkAt: z.string().optional(),
+});
+export type RecordingMeta = z.infer<typeof RecordingMeta>;
+
+/** One captured utterance, from in-browser speech-to-text during the call. */
+export const TranscriptSegment = z.object({
+  speaker: z.enum(['candidate', 'interviewer', 'unknown']).default('unknown'),
+  text: z.string(),
+  at: z.string().optional(),
+});
+export type TranscriptSegment = z.infer<typeof TranscriptSegment>;
+
+export const InterviewRecommendation = z.enum(['strong-hire', 'hire', 'lean-hire', 'lean-no-hire', 'no-hire']);
+export type InterviewRecommendation = z.infer<typeof InterviewRecommendation>;
+
+export const CompetencyScore = z.object({
+  name: z.string(),
+  score: z.number().min(0).max(100),
+  evidence: z.string().default(''),
+});
+export type CompetencyScore = z.infer<typeof CompetencyScore>;
+
+/** AI-generated structured debrief produced from the interview transcript. */
+export const InterviewReport = z.object({
+  summary: z.string().default(''),
+  overallScore: z.number().min(0).max(100),
+  recommendation: InterviewRecommendation,
+  competencies: z.array(CompetencyScore).default([]),
+  strengths: z.array(z.string()).default([]),
+  concerns: z.array(z.string()).default([]),
+  followUps: z.array(z.string()).default([]),
+  mode: ResultMode,
+  generatedAt: z.string().optional(),
+});
+export type InterviewReport = z.infer<typeof InterviewReport>;
+
+/** A scheduled, browser-based video interview tying a requisition + candidate through record → transcribe → report. */
+export const InterviewSession = z.object({
+  id: z.string(),
+  requisitionId: z.string(),
+  candidateId: z.string(),
+  candidateName: z.string(),
+  candidateContact: z.string().default(''),
+  jobTitle: z.string(),
+  company: z.string(),
+  recruiterId: z.string().default('recruiter-demo'),
+  scheduledAt: z.string(),
+  durationMins: z.number().int().min(5).max(240).default(30),
+  status: InterviewStatus.default('scheduled'),
+  invites: z.array(InterviewInvite).default([]),
+  recording: RecordingMeta.default({}),
+  transcript: z.array(TranscriptSegment).default([]),
+  report: InterviewReport.optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type InterviewSession = z.infer<typeof InterviewSession>;
+
 /* ─────────────────────────── API envelope ─────────────────────────── */
 
 export type ApiOk<T> = { ok: true; data: T };

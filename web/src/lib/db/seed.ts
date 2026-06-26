@@ -11,6 +11,7 @@ import type {
   Application,
   AuditEntry,
   CandidateProfile,
+  InterviewSession,
   Job,
   MatchResult,
   OutreachMessage,
@@ -27,6 +28,7 @@ export interface SeedData {
   pipeline: PipelineCard[];
   applications: Application[];
   outreach: OutreachMessage[];
+  interviews: InterviewSession[];
   audit: AuditEntry[];
 }
 
@@ -42,6 +44,7 @@ const T = {
   jun15: '2026-06-15T08:20:00.000Z',
   jun18: '2026-06-18T13:00:00.000Z',
   jun20: '2026-06-20T10:00:00.000Z',
+  jun30: '2026-06-30T15:00:00.000Z',
 } as const;
 
 /* ─────────────────────────── Jobs ─────────────────────────── */
@@ -785,6 +788,38 @@ const outreach: OutreachMessage[] = [
   },
 ];
 
+/* ─────────────────────────── Video interviews ─────────────────────────── */
+
+const interviews: InterviewSession[] = [
+  {
+    id: 'iv-1',
+    requisitionId: 'req-1',
+    candidateId: 'cand-seeker-5',
+    candidateName: 'Sofia Rossi',
+    candidateContact: 'sofia.rossi@example.com',
+    jobTitle: 'Senior Frontend Engineer',
+    company: 'Northwind Labs',
+    recruiterId: 'recruiter-demo',
+    scheduledAt: T.jun30,
+    durationMins: 45,
+    status: 'scheduled',
+    invites: [
+      {
+        channel: 'in-app',
+        to: 'cand-seeker-5',
+        subject: 'Video interview: Senior Frontend Engineer @ Northwind Labs',
+        body: 'You have a 45-minute video interview scheduled. Join from your Interviews tab when it’s time.',
+        status: 'sent',
+        sentAt: T.jun20,
+      },
+    ],
+    recording: { chunkCount: 0, totalBytes: 0, mimeType: '', durationSec: 0, complete: false },
+    transcript: [],
+    createdAt: T.jun20,
+    updatedAt: T.jun20,
+  },
+];
+
 /* ─────────────────────────── Audit log ─────────────────────────── */
 
 const audit: AuditEntry[] = [
@@ -812,6 +847,12 @@ export function seedData(): SeedData {
     pipeline: pipeline.map((c) => ({ ...c, match: { ...c.match, breakdown: { ...c.match.breakdown } } })),
     applications: applications.map((a) => ({ ...a })),
     outreach: outreach.map((m) => ({ ...m })),
+    interviews: interviews.map((iv) => ({
+      ...iv,
+      invites: iv.invites.map((n) => ({ ...n })),
+      recording: { ...iv.recording },
+      transcript: iv.transcript.map((t) => ({ ...t })),
+    })),
     audit: audit.map((a) => ({ ...a })),
   };
 }

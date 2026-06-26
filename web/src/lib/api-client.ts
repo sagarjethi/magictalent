@@ -90,6 +90,16 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   return unwrap<T>(res);
 }
 
+/** POST a raw binary body (e.g. a MediaRecorder video chunk). Auth + envelope handled. */
+export async function apiPostBinary<T>(path: string, blob: Blob): Promise<T> {
+  const res = await fetch(resolveUrl(path), {
+    method: 'POST',
+    headers: { 'content-type': blob.type || 'application/octet-stream', ...authHeader() },
+    body: blob,
+  });
+  return unwrap<T>(res);
+}
+
 export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(resolveUrl(path), {
     method: 'PATCH',

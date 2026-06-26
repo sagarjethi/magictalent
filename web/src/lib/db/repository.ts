@@ -6,6 +6,7 @@
 import type {
   Requisition, Job, CandidateProfile, SeekerProfile,
   PipelineCard, Application, OutreachMessage, AuditEntry, PipelineStage, ApplicationStatus,
+  InterviewSession,
 } from '@/lib/domain/types';
 
 export interface Repository {
@@ -44,6 +45,14 @@ export interface Repository {
    * outreach that target this seeker's own candidate profile. Empty if no recruiter has engaged.
    */
   interestForSeeker(seekerId: string): { cards: PipelineCard[]; outreach: OutreachMessage[] };
+
+  // Video interviews (live, browser-based: schedule → notify → record → transcribe → report)
+  listInterviews(requisitionId?: string): InterviewSession[];
+  getInterview(id: string): InterviewSession | undefined;
+  createInterview(s: InterviewSession): InterviewSession;
+  updateInterview(id: string, patch: Partial<InterviewSession>): InterviewSession | undefined;
+  /** Interviews where the candidate is this platform seeker (their own upcoming/past calls). */
+  interviewsForSeeker(seekerId: string): InterviewSession[];
 
   // Audit
   listAudit(limit?: number): AuditEntry[];
