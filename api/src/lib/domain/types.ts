@@ -263,6 +263,29 @@ export const InterviewKit = z.object({
 });
 export type InterviewKit = z.infer<typeof InterviewKit>;
 
+/* ─────────────────────────── Outreach sequence (lifecycle stage 6: Hire) ─────────────────────────── */
+
+export const OutreachChannel = z.enum(['email', 'inmail', 'sms']);
+export type OutreachChannel = z.infer<typeof OutreachChannel>;
+
+export const SequenceStep = z.object({
+  dayOffset: z.number().int().min(0).max(60),
+  channel: OutreachChannel,
+  subject: z.string(),
+  body: z.string(),
+  goal: z.string().default(''),
+});
+export type SequenceStep = z.infer<typeof SequenceStep>;
+
+/** A multi-touch outreach cadence tailored to a (job, candidate) pairing. */
+export const OutreachSequence = z.object({
+  candidateName: z.string(),
+  jobTitle: z.string(),
+  steps: z.array(SequenceStep).default([]),
+  mode: ResultMode,
+});
+export type OutreachSequence = z.infer<typeof OutreachSequence>;
+
 /* ─────────────────────────── API envelope ─────────────────────────── */
 
 export type ApiOk<T> = { ok: true; data: T };
