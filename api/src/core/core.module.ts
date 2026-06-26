@@ -7,10 +7,11 @@ import { RepoService } from './repo.service';
 import { MatchingService } from './matching.service';
 import { SourcingService } from './sourcing.service';
 import { AgentsService } from './agents.service';
+import { AuthService } from './auth.service';
 
 @Global()
 @Module({
-  providers: [RepoService, MatchingService, SourcingService, AgentsService],
-  exports: [RepoService, MatchingService, SourcingService, AgentsService],
+  providers: [RepoService, MatchingService, SourcingService, AgentsService, AuthService],
+  exports: [RepoService, MatchingService, SourcingService, AgentsService, AuthService],
 })
 export class CoreModule {}

@@ -17,10 +17,12 @@ import { SeekerController } from './modules/seeker.controller';
 import { AtsController } from './modules/ats.controller';
 import { AgentController } from './modules/agent.controller';
 import { AuditController } from './modules/audit.controller';
+import { AuthController } from './modules/auth.controller';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }), CoreModule],
   controllers: [
+    AuthController,
     HealthController,
     RequisitionsController,
     JobsController,

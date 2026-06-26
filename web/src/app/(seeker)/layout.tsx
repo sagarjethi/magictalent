@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { LayoutDashboard, FileText, ShieldCheck, Compass, ClipboardList, Sparkles } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { AuthProvider, AuthGate, UserMenu } from '@/lib/auth-context';
 
 const seekerNav = [
   { href: '/seeker', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -13,8 +14,10 @@ const seekerNav = [
 
 export default function SeekerLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell portal="seeker" navItems={seekerNav}>
-      {children}
-    </AppShell>
+    <AuthProvider>
+      <AppShell portal="seeker" navItems={seekerNav} actions={<UserMenu />}>
+        <AuthGate role="seeker">{children}</AuthGate>
+      </AppShell>
+    </AuthProvider>
   );
 }

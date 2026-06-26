@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Sparkles, Send, User } from 'lucide-react';
 import { Card, CardBody, Button, Textarea, Alert, Spinner, Badge } from '@/components/ui';
-import { apiPost, CURRENT_SEEKER_ID } from '@/lib/api-client';
+import { apiPost, getCurrentSeekerId } from '@/lib/api-client';
 import type { AgentStep, ResultMode } from '@/lib/domain/types';
 import { AgentTrace } from '../../_components/AgentTrace';
 
@@ -44,7 +44,7 @@ export function CopilotChat() {
     try {
       const res = await apiPost<{ mode: ResultMode; steps: AgentStep[]; answer: string }>(
         '/api/agent/copilot',
-        { seekerId: CURRENT_SEEKER_ID, question: q },
+        { seekerId: getCurrentSeekerId(), question: q },
       );
       setTurns((t) =>
         t.map((x) =>

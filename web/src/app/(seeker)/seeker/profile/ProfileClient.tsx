@@ -14,7 +14,7 @@ import {
   ModeBadge,
   Alert,
 } from '@/components/ui';
-import { apiPost, CURRENT_SEEKER_ID } from '@/lib/api-client';
+import { apiPost, getCurrentSeekerId } from '@/lib/api-client';
 import type { SeekerProfile } from '@/lib/domain/types';
 
 export function ProfileClient({ initial }: { initial: SeekerProfile | null }) {
@@ -32,7 +32,7 @@ export function ProfileClient({ initial }: { initial: SeekerProfile | null }) {
     setError('');
     try {
       const saved = await apiPost<SeekerProfile>('/api/seeker/profile', {
-        id: CURRENT_SEEKER_ID,
+        id: getCurrentSeekerId(),
         name,
         email: email || '',
         location: location || undefined,

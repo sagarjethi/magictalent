@@ -15,7 +15,7 @@ import {
   EmptyState,
   cn,
 } from '@/components/ui';
-import { apiPost, CURRENT_SEEKER_ID } from '@/lib/api-client';
+import { apiPost, getCurrentSeekerId } from '@/lib/api-client';
 import type { RankedJob, Application } from '@/lib/domain/types';
 import { MatchDetails } from '../../_components/MatchDetails';
 
@@ -51,7 +51,7 @@ export function JobsBoard({
     setStates((s) => ({ ...s, [jobId]: { phase: 'loading' } }));
     try {
       const app = await apiPost<Application>('/api/applications', {
-        seekerId: CURRENT_SEEKER_ID,
+        seekerId: getCurrentSeekerId(),
         jobId,
         autoCoverLetter: true,
       });

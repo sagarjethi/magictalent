@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Briefcase, Radar, KanbanSquare, Send, BarChart3, ClipboardList } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { AuthProvider, AuthGate, UserMenu } from '@/lib/auth-context';
 
 const recruiterNav = [
   { href: '/recruiter', label: 'Requisitions', icon: <Briefcase className="h-4 w-4" /> },
@@ -13,8 +14,10 @@ const recruiterNav = [
 
 export default function RecruiterLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AppShell portal="recruiter" navItems={recruiterNav}>
-      {children}
-    </AppShell>
+    <AuthProvider>
+      <AppShell portal="recruiter" navItems={recruiterNav} actions={<UserMenu />}>
+        <AuthGate role="recruiter">{children}</AuthGate>
+      </AppShell>
+    </AuthProvider>
   );
 }

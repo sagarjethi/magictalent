@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Send, CheckCircle2, FileText } from 'lucide-react';
 import { Button, Alert } from '@/components/ui';
-import { apiPost, CURRENT_SEEKER_ID } from '@/lib/api-client';
+import { apiPost, getCurrentSeekerId } from '@/lib/api-client';
 import type { Application } from '@/lib/domain/types';
 
 export function ApplyPanel({ jobId, alreadyApplied }: { jobId: string; alreadyApplied: boolean }) {
@@ -17,7 +17,7 @@ export function ApplyPanel({ jobId, alreadyApplied }: { jobId: string; alreadyAp
     setError('');
     try {
       const app = await apiPost<Application>('/api/applications', {
-        seekerId: CURRENT_SEEKER_ID,
+        seekerId: getCurrentSeekerId(),
         jobId,
         autoCoverLetter: true,
       });

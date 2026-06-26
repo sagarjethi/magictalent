@@ -211,6 +211,27 @@ export const AuditEntry = z.object({
 });
 export type AuditEntry = z.infer<typeof AuditEntry>;
 
+/* ─────────────────────────── Auth & accounts ─────────────────────────── */
+
+export const UserRole = z.enum(['seeker', 'recruiter']);
+export type UserRole = z.infer<typeof UserRole>;
+
+/** The authenticated principal. Never carries the password hash to the client. */
+export const User = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  role: UserRole,
+  /** For seeker accounts: the linked SeekerProfile id (drives their portal data). */
+  seekerId: z.string().optional(),
+  createdAt: z.string(),
+});
+export type User = z.infer<typeof User>;
+
+/** Returned by login/register: a bearer token + the public user. */
+export const AuthResult = z.object({ token: z.string(), user: User });
+export type AuthResult = z.infer<typeof AuthResult>;
+
 /* ─────────────────────────── Interview kit (lifecycle stage 4: Interview) ─────────────────────────── */
 
 export const InterviewQuestionType = z.enum(['technical', 'behavioral', 'system-design', 'culture']);
