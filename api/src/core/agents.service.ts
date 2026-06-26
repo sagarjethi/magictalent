@@ -2,11 +2,12 @@
  * AgentsService — DI wrapper over the LangGraph agents (graceful degradation preserved).
  */
 import { Injectable } from '@nestjs/common';
-import type { AgentStep, RankedCandidate, InterviewKit, OutreachSequence } from '../lib/domain/types';
+import type { AgentStep, RankedCandidate, InterviewKit, OutreachSequence, InterviewPrep } from '../lib/domain/types';
 import { runSourcingAgent } from '../lib/agents/sourcing-agent';
 import { runCareerCopilot } from '../lib/agents/career-copilot';
 import { runInterviewKit } from '../lib/agents/interview-kit';
 import { runOutreachSequence } from '../lib/agents/outreach-sequence';
+import { runInterviewPrep } from '../lib/agents/interview-prep';
 import { agentModelEnabled } from '../lib/agents/model';
 
 @Injectable()
@@ -29,5 +30,9 @@ export class AgentsService {
 
   runOutreachSequence(requisitionId: string, candidateId: string): Promise<{ steps: AgentStep[]; sequence: OutreachSequence }> {
     return runOutreachSequence(requisitionId, candidateId);
+  }
+
+  runInterviewPrep(seekerId: string, jobId: string): Promise<{ steps: AgentStep[]; prep: InterviewPrep }> {
+    return runInterviewPrep(seekerId, jobId);
   }
 }

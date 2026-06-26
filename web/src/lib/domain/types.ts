@@ -286,6 +286,26 @@ export const OutreachSequence = z.object({
 });
 export type OutreachSequence = z.infer<typeof OutreachSequence>;
 
+/* ─────────────────────────── Interview prep (seeker-side) ─────────────────────────── */
+
+export const PrepQuestion = z.object({
+  type: InterviewQuestionType,
+  question: z.string(),
+  tip: z.string().default(''),
+});
+export type PrepQuestion = z.infer<typeof PrepQuestion>;
+
+/** A candidate-side prep pack for a target job: likely questions, talking points, gaps to address. */
+export const InterviewPrep = z.object({
+  jobTitle: z.string(),
+  company: z.string(),
+  questions: z.array(PrepQuestion).default([]),
+  talkingPoints: z.array(z.string()).default([]),
+  gapsToAddress: z.array(z.string()).default([]),
+  mode: ResultMode,
+});
+export type InterviewPrep = z.infer<typeof InterviewPrep>;
+
 /* ─────────────────────────── API envelope ─────────────────────────── */
 
 export type ApiOk<T> = { ok: true; data: T };

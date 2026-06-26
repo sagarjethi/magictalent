@@ -18,6 +18,10 @@ const InterviewKitSchema = z.object({
   candidateId: z.string().min(1, 'candidateId is required'),
 });
 const OutreachSequenceSchema = InterviewKitSchema;
+const InterviewPrepSchema = z.object({
+  seekerId: z.string().min(1, 'seekerId is required'),
+  jobId: z.string().min(1, 'jobId is required'),
+});
 
 @Controller('agent')
 export class AgentController {
@@ -53,5 +57,12 @@ export class AgentController {
     const { requisitionId, candidateId } = validate(OutreachSequenceSchema, body);
     const { steps, sequence } = await this.agents.runOutreachSequence(requisitionId, candidateId);
     return ok({ steps, sequence });
+  }
+
+  @Post('interview-prep')
+  async interviewPrep(@Body() body: unknown) {
+    const { seekerId, jobId } = validate(InterviewPrepSchema, body);
+    const { steps, prep } = await this.agents.runInterviewPrep(seekerId, jobId);
+    return ok({ steps, prep });
   }
 }
