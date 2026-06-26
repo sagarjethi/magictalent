@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { getRepo } from '@/lib/db';
 import { searchAllSources } from '@/lib/sources/source-factory';
 import { rankCandidates } from '@/lib/matching/scorer';
-import { ok, fail, readJson } from '../_helpers';
+import { ok, fail, readJson, requireUser, handleError } from '../_helpers';
 
 export const runtime = 'nodejs';
 
@@ -18,6 +18,7 @@ const BodySchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = BodySchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
 
@@ -28,6 +29,6 @@ export async function POST(req: Request) {
     const ranked = rankCandidates(requisition.spec, candidates);
     return ok({ count: ranked.length, ranked });
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }

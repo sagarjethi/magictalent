@@ -8,16 +8,17 @@ import { OutreachMessage, CandidateProfile } from '@/lib/domain/types';
 import { getRepo } from '@/lib/db';
 import { draftOutreach } from '@/lib/matching/tailor';
 import { aiEnabled } from '@/lib/ai/client';
-import { ok, fail, readJson, newId, nowIso } from '../_helpers';
+import { ok, fail, readJson, newId, nowIso, requireUser, handleError } from '../_helpers';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   try {
+    requireUser(req);
     const requisitionId = new URL(req.url).searchParams.get('requisitionId') ?? undefined;
     return ok(getRepo().listOutreach(requisitionId));
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
 
@@ -30,6 +31,7 @@ const BodySchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = BodySchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
     const repo = getRepo();
@@ -58,6 +60,6 @@ export async function POST(req: Request) {
     repo.audit({ actor: requisition.ownerId, action: 'outreach.draft', target: created.id });
     return ok(created, 201);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }

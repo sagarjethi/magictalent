@@ -5,7 +5,7 @@
 import { z } from 'zod';
 import { runCareerCopilot } from '@/lib/agents/career-copilot';
 import { agentModelEnabled } from '@/lib/agents/model';
-import { ok, fail, readJson } from '../../_helpers';
+import { ok, fail, readJson, requireUser, handleError } from '../../_helpers';
 
 export const runtime = 'nodejs';
 
@@ -16,12 +16,13 @@ const BodySchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = BodySchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
 
     const { steps, answer } = await runCareerCopilot(parsed.data.seekerId, parsed.data.question);
     return ok({ mode: agentModelEnabled() ? 'ai' : 'heuristic', steps, answer });
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }

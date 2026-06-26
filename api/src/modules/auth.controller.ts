@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { UserRole } from '../lib/domain/types';
 import { AuthService } from '../core/auth.service';
 import { ok, validate, apiError } from '../common/api';
+import { Public } from '../common/public.decorator';
 
 const LoginSchema = z.object({
   email: z.string().min(1, 'email is required'),
@@ -28,6 +29,7 @@ function bearer(header?: string): string | null {
   return match ? match[1].trim() : null;
 }
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}

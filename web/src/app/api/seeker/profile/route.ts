@@ -7,19 +7,20 @@ import { z } from 'zod';
 import { SeekerProfile, CandidateProfile } from '@/lib/domain/types';
 import { getRepo } from '@/lib/db';
 import { parseResume } from '@/lib/matching/resume-parser';
-import { ok, fail, readJson, newId, nowIso } from '../../_helpers';
+import { ok, fail, readJson, newId, nowIso, requireUser, handleError } from '../../_helpers';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   try {
+    requireUser(req);
     const seekerId = new URL(req.url).searchParams.get('seekerId');
     if (!seekerId) return ok(getRepo().listSeekers());
     const seeker = getRepo().getSeeker(seekerId);
     if (!seeker) return fail(`Seeker ${seekerId} not found`, 404);
     return ok(seeker);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
 
@@ -33,6 +34,7 @@ const BodySchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = BodySchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
     const repo = getRepo();
@@ -70,6 +72,6 @@ export async function POST(req: Request) {
     repo.audit({ actor: id, action: 'seeker.upsert', target: id });
     return ok(saved, 201);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }

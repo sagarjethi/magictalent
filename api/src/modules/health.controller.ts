@@ -3,9 +3,11 @@
  */
 import { Controller, Get } from '@nestjs/common';
 import { ok } from '../common/api';
+import { Public } from '../common/public.decorator';
 import { aiEnabled } from '../lib/ai/client';
 import { agentModelEnabled } from '../lib/agents/model';
 
+@Public()
 @Controller('health')
 export class HealthController {
   @Get()

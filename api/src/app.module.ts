@@ -3,8 +3,10 @@
  * REST controllers that mirror the Next.js /api routes.
  */
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { CoreModule } from './core/core.module';
+import { AuthGuard } from './common/auth.guard';
 import { HealthController } from './modules/health.controller';
 import { RequisitionsController } from './modules/requisitions.controller';
 import { JobsController } from './modules/jobs.controller';
@@ -36,5 +38,6 @@ import { AuthController } from './modules/auth.controller';
     AgentController,
     AuditController,
   ],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {}

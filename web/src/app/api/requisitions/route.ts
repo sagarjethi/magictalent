@@ -6,15 +6,16 @@ import { z } from 'zod';
 import { Requisition } from '@/lib/domain/types';
 import { getRepo } from '@/lib/db';
 import { parseJobDescription } from '@/lib/matching/jd-parser';
-import { ok, fail, readJson, newId, nowIso } from '../_helpers';
+import { ok, fail, readJson, newId, nowIso, requireUser, handleError } from '../_helpers';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    requireUser(req);
     return ok(getRepo().listRequisitions());
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
 
@@ -27,6 +28,7 @@ const CreateSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = CreateSchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
 
@@ -47,6 +49,6 @@ export async function POST(req: Request) {
     getRepo().audit({ actor: created.ownerId, action: 'requisition.create', target: created.id });
     return ok(created, 201);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }

@@ -6,16 +6,17 @@ import { z } from 'zod';
 import { Application, ApplicationStatus } from '@/lib/domain/types';
 import { getRepo } from '@/lib/db';
 import { draftCoverLetter } from '@/lib/matching/tailor';
-import { ok, fail, readJson, newId, nowIso } from '../_helpers';
+import { ok, fail, readJson, newId, nowIso, requireUser, handleError } from '../_helpers';
 
 export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   try {
+    requireUser(req);
     const seekerId = new URL(req.url).searchParams.get('seekerId') ?? undefined;
     return ok(getRepo().listApplications(seekerId));
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
 
@@ -29,6 +30,7 @@ const CreateSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    requireUser(req);
     const parsed = CreateSchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
     const repo = getRepo();
@@ -57,7 +59,7 @@ export async function POST(req: Request) {
     repo.audit({ actor: parsed.data.seekerId, action: 'application.create', target: created.id });
     return ok(created, 201);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
 
@@ -65,6 +67,7 @@ const PatchSchema = z.object({ id: z.string().min(1), status: ApplicationStatus 
 
 export async function PATCH(req: Request) {
   try {
+    requireUser(req);
     const parsed = PatchSchema.safeParse(await readJson(req));
     if (!parsed.success) return fail('Invalid request body', 422, parsed.error.flatten());
     const repo = getRepo();
@@ -73,6 +76,6 @@ export async function PATCH(req: Request) {
     repo.audit({ actor: updated.seekerId, action: `application.status.${parsed.data.status}`, target: updated.id });
     return ok(updated);
   } catch (e) {
-    return fail((e as Error).message, 500);
+    return handleError(e);
   }
 }
