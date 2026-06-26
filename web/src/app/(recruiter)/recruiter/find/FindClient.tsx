@@ -11,6 +11,8 @@ import {
   ChevronDown,
   ExternalLink,
   Users,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import {
   Card,
@@ -58,6 +60,9 @@ export function FindClient({
   const [run, setRun] = React.useState<RunState>({ phase: 'idle' });
   const [rows, setRows] = React.useState<Record<string, RowAction>>({});
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
+  // Blind screening: redact identity (name, avatar, profile link, location) while
+  // keeping skills + the explainable score, to reduce bias at the screening stage.
+  const [blind, setBlind] = React.useState(false);
 
   const currentReq = requisitions.find((r) => r.id === reqId);
 
@@ -243,14 +248,38 @@ export function FindClient({
             <AgentTrace steps={run.steps} mode={run.mode} title="Sourcing Agent reasoning" />
           )}
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
               <Users className="h-5 w-5 text-brand-600" aria-hidden="true" />
               Shortlist
               <span className="text-sm font-normal text-ink-faint">({run.shortlist.length})</span>
             </h2>
-            <ModeBadge mode={run.mode} />
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={blind}
+                onClick={() => setBlind((v) => !v)}
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                  blind
+                    ? 'border-brand-300 bg-brand-50 text-brand-700'
+                    : 'border-slate-200 text-ink-soft hover:bg-surface-sunken',
+                )}
+              >
+                {blind ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                Blind screening {blind ? 'on' : 'off'}
+              </button>
+              <ModeBadge mode={run.mode} />
+            </div>
           </div>
+
+          {blind && (
+            <Alert tone="info">
+              Blind screening is on — names, photos, profile links and location are hidden so you
+              rank on skills and the explainable score alone. Reveal identities after you&apos;ve shortlisted.
+            </Alert>
+          )}
 
           {run.shortlist.length === 0 ? (
             <EmptyState
@@ -258,22 +287,29 @@ export function FindClient({
               description="No candidates matched this requisition across the enabled sources."
             />
           ) : (
-            run.shortlist.map((rc) => {
+            run.shortlist.map((rc, i) => {
               const id = rc.candidate.id;
               const row = rows[id] ?? {};
               const open = expanded.has(id);
+              const displayName = blind ? `Candidate #${i + 1}` : rc.candidate.name;
               return (
                 <Card key={id}>
                   <CardBody className="space-y-4">
                     <div className="flex items-start gap-4">
-                      <Avatar name={rc.candidate.name} size="lg" />
+                      {blind ? (
+                        <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-ink-faint" aria-hidden="true">
+                          <EyeOff className="h-5 w-5" />
+                        </span>
+                      ) : (
+                        <Avatar name={rc.candidate.name} size="lg" />
+                      )}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-semibold text-ink">{rc.candidate.name}</h3>
+                          <h3 className="text-lg font-semibold text-ink">{displayName}</h3>
                           <Badge tone={SOURCE_TONE[rc.candidate.source]} size="sm">
                             {SOURCE_LABEL[rc.candidate.source]}
                           </Badge>
-                          {rc.candidate.sourceUrl && (
+                          {!blind && rc.candidate.sourceUrl && (
                             <a
                               href={rc.candidate.sourceUrl}
                               target="_blank"
@@ -288,7 +324,7 @@ export function FindClient({
                         <p className="text-sm text-ink-faint">{rc.candidate.headline}</p>
                         <p className="mt-0.5 text-xs text-ink-faint">
                           {rc.candidate.yearsExperience} yrs · {rc.candidate.seniority}
-                          {rc.candidate.location ? ` · ${rc.candidate.location}` : ''}
+                          {!blind && rc.candidate.location ? ` · ${rc.candidate.location}` : ''}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {rc.candidate.skills.slice(0, 6).map((s) => (
